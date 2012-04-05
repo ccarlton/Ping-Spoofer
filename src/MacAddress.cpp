@@ -19,7 +19,7 @@ public:
 
         printf("String mac: %s\n", m_stringMacAddress);
         /* Format */
-        for(i=0; i<strlen(m_stringMacAddress); i++) {
+        for(i=0; (unsigned int)i<strlen(m_stringMacAddress); i++) {
             if (m_stringMacAddress[i] != 58) {
                 memcpy(&subString[strlen(subString)], &m_stringMacAddress[i], 1);
             }

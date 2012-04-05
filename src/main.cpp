@@ -14,9 +14,12 @@ int main(int argc, char **argv) {
     macAddress->parse_mac();
     PingSpoofer *pingSpoofer = new PingSpoofer(macAddress, argv[2]);
     pingSpoofer->prepare_pcap();
+	 pingSpoofer->run();
     
     delete pingSpoofer;
     delete macAddress;
+
+    return 1;
 }
 
 void print_usage() {

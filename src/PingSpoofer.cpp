@@ -1,7 +1,4 @@
 #include "PCAPListener.cpp"
-#include "Responder.cpp"
-#include "ICMPResponder.cpp"
-#include "ARPResponder.cpp"
 #include <vector>
 
 #include "smartalloc.h"
@@ -13,34 +10,35 @@ private:
     MacAddress *m_macAddress;
     PCAPListener *m_pcapListener;
     char *m_ipAddressString;
-    vector<Responder*> m_responderList;
+    int m_socketfd;
 
 public:
     PingSpoofer(MacAddress *macAddress, char *ipAddressString)
         : m_macAddress(macAddress), m_ipAddressString(ipAddressString) 
     {
-        m_responderList.push_back(new ICMPResponder());
-        m_responderList.push_back(new ARPResponder());
         m_pcapListener = new PCAPListener(m_ipAddressString);
+        build_socket();
     }
     ~PingSpoofer() {
         delete m_pcapListener;
-        std::vector<Responder*>::iterator itr;
-        for ( itr = m_responderList.begin(); itr < m_responderList.end(); ++itr) {
-            delete *itr; 
-        }
-  
-        m_responderList.clear();
     } 
 
-    int prepare_pcap() {
+    void prepare_pcap() {
         m_pcapListener->setup();
         m_pcapListener->filter();    
     }
 
-    int run() {
-        m_pcapListener->listen();
-        printf("ran");
+    void run() {
+        m_pcapListener->listen(m_socketfd);
+    }
+    
+    int build_socket() {
+        if ((sockfd = socket(AF_INET, SOCK_PACKET, htons(ETH_P_RARP))) < 0) {
+            perror("socket");
+            return -1;
+        } 
+        m_socketfd = sockfd;
+        return socketfd;
     }
  
 };
